@@ -1,6 +1,6 @@
 module vachettp
 
-struct Request {
+pub struct Request {
 	method string
 	path string
 	protocol_version string
