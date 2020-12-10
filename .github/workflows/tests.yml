@@ -1,0 +1,25 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - '*'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up V version latest
+        uses: nocturlab/setup-vlang-action@master
+        with:
+          v-version: latest
+        id: v
+      - name: Build repository app
+        run: v . -shared
+      - name: Run V tests
+        run: v test .
