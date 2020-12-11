@@ -5,7 +5,13 @@ pub struct RequestParser {
 }
 
 pub fn (requestParser RequestParser) parse() Request {
-	elements := requestParser.command.split(' ')
+	lines := requestParser.command.split('\r\n')
+
+	if 0 == lines.len {
+		return Request{}
+	}
+
+	elements := lines[0].split(' ')
 
 	if elements.len != 3 {
 		return Request{}
@@ -15,6 +21,7 @@ pub fn (requestParser RequestParser) parse() Request {
 		method : set_method(elements[0])// or { return error(err) }
 		path : set_path(elements[1])
 		protocol_version : set_protocol_version(elements[2])
+		headers : set_headers(lines[1..])
 	}
 }
 
@@ -58,4 +65,16 @@ fn set_path(path string) string {
 	// return error('Request has wrong path format.')
 	println('Request has wrong path format.')
 	return ''
+}
+
+fn set_headers(lines []string) map[string]string {
+	mut headers := map[string]string
+	for line in lines {
+		elements := line.split(':')
+		if 2 == elements.len {
+			headers[elements[0].trim(' ')] = elements[1].trim(' ')
+		}
+	}
+
+	return headers
 }

@@ -68,7 +68,7 @@ fn test_command_first_line() {
 		RequestTestCase{'GET', vachettp.Request{}},
 		RequestTestCase{'GET /', vachettp.Request{}},
 		RequestTestCase{'GET HTTP/2', vachettp.Request{}},
-		RequestTestCase{'GET / HTTP/2', vachettp.Request{'GET', '/', 'HTTP/2'}},
+		RequestTestCase{'GET / HTTP/2', vachettp.Request{'GET', '/', 'HTTP/2', map[string]string{}}},
 		RequestTestCase{'GET / HTTP/2 foo', vachettp.Request{}},
 	]
 
@@ -78,5 +78,21 @@ fn test_command_first_line() {
 		assert r.get_method() == test_case.expect.get_method()
 		assert r.get_path() == test_case.expect.get_path()
 		assert r.get_protocol_version() == test_case.expect.get_protocol_version()
+	}
+}
+
+fn test_multiline() {
+	test_cases := [
+		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json'}}}
+		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json\r\nAuthorization: Bearer 1337', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json', 'Authorization': 'Bearer 1337'}}}
+	]
+
+	for test_case in test_cases {
+		r := vachettp.RequestParser{test_case.given}.parse()
+
+		assert r.get_method() == test_case.expect.get_method()
+		assert r.get_path() == test_case.expect.get_path()
+		assert r.get_protocol_version() == test_case.expect.get_protocol_version()
+		assert r.get_headers() == test_case.expect.get_headers()
 	}
 }
