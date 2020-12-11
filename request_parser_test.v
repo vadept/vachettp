@@ -56,3 +56,27 @@ fn test_path_parsing() {
 		assert test_case.expect == r.get_path()
 	}
 }
+
+struct RequestTestCase {
+	given string
+	expect vachettp.Request
+}
+
+fn test_command_first_line() {
+	test_cases := [
+		RequestTestCase{'', vachettp.Request{}},
+		RequestTestCase{'GET', vachettp.Request{}},
+		RequestTestCase{'GET /', vachettp.Request{}},
+		RequestTestCase{'GET HTTP/2', vachettp.Request{}},
+		RequestTestCase{'GET / HTTP/2', vachettp.Request{'GET', '/', 'HTTP/2'}},
+		RequestTestCase{'GET / HTTP/2 foo', vachettp.Request{}},
+	]
+
+	for test_case in test_cases {
+		r := vachettp.RequestParser{test_case.given}.parse()
+
+		assert r.get_method() == test_case.expect.get_method()
+		assert r.get_path() == test_case.expect.get_path()
+		assert r.get_protocol_version() == test_case.expect.get_protocol_version()
+	}
+}

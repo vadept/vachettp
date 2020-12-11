@@ -7,6 +7,10 @@ pub struct RequestParser {
 pub fn (requestParser RequestParser) parse() Request {
 	elements := requestParser.command.split(' ')
 
+	if elements.len != 3 {
+		return Request{}
+	}
+
 	return Request{
 		method : set_method(elements[0])// or { return error(err) }
 		path : set_path(elements[1])
