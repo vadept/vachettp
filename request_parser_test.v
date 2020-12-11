@@ -26,9 +26,21 @@ fn test_method_parsing() {
 	}
 }
 
-// fn test_parse_command() {
-// 	rp := vachettp.RequestParser{command : 'GET /foo HTTP/1.1'}
-// 	r := rp.parse() or { vachettp.Request{} }
+fn test_protocol_version_parsing() {
+	test_cases := [
+		TestCase{'GET /foo HTTP/1.0', 'HTTP/1.0'},
+		TestCase{'GET /foo http/1.0', 'http/1.0'},
+		TestCase{'GET /foo HTTP/1.1', 'HTTP/1.1'},
+		TestCase{'GET /foo http/1.1', 'http/1.1'},
+		TestCase{'GET /foo HTTP/2', 'HTTP/2'},
+		TestCase{'GET /foo http/2', 'http/2'},
+		TestCase{'GET /foo HTTP2', ''},
+		TestCase{'GET /foo HTTP/3', ''},
+	]
 
-// 	assert 'GET' == r.get_method()
-// }
+	for test_case in test_cases {
+		r := vachettp.RequestParser{test_case.given}.parse()
+
+		assert test_case.expect == r.get_protocol_version()
+	}
+}
