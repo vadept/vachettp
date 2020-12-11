@@ -6,9 +6,10 @@ pub struct RequestParser {
 
 pub fn (requestParser RequestParser) parse() Request {
 	elements := requestParser.command.split(' ')
+
 	return Request{
 		method : set_method(elements[0])// or { return error(err) }
-		path : elements[1]
+		path : set_path(elements[1])
 		protocol_version : set_protocol_version(elements[2])
 	}
 }
@@ -41,5 +42,16 @@ fn set_protocol_version(protocol_version string) string {
 	// TODO: handle error
 	// return error('Request has wrong protocol version or protocol version is not supported.')
 	println('Request has wrong protocol version or protocol version is not supported.')
+	return ''
+}
+
+fn set_path(path string) string {
+	if path[0] == `/` {
+		return path
+	}
+
+	// TODO: handle error
+	// return error('Request has wrong path format.')
+	println('Request has wrong path format.')
 	return ''
 }
