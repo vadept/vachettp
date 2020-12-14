@@ -22,6 +22,7 @@ pub fn (requestParser RequestParser) parse() Request {
 		path : set_path(elements[1])
 		protocol_version : set_protocol_version(elements[2])
 		headers : set_headers(lines[1..])
+		query_params : set_query_params(elements[1])
 	}
 }
 
@@ -57,8 +58,9 @@ fn set_protocol_version(protocol_version string) string {
 }
 
 fn set_path(path string) string {
-	if path[0] == `/` {
-		return path
+	splitted_path := path.split('?')
+	if splitted_path[0][0] == `/` {
+		return splitted_path[0]
 	}
 
 	// TODO: handle error
@@ -77,4 +79,21 @@ fn set_headers(lines []string) map[string]string {
 	}
 
 	return headers
+}
+
+fn set_query_params(path string) map[string]string {
+	path_parts := path.split('?')
+	if 2 != path_parts.len {
+		return map[string]string{}
+	}
+	mut query_params := map[string]string
+	query_elements := path_parts[1].split('&')
+	for query_element in query_elements {
+		query_parts := query_element.split('=')
+		if 2 == query_parts.len {
+			query_params[query_parts[0]] = query_parts[1]
+		}
+	}
+
+	return query_params
 }

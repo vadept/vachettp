@@ -27,3 +27,10 @@ fn test_get_headers() {
 
 	assert r.get_headers() == {'Content-Type': 'application/json'}
 }
+
+fn test_get_query_params() {
+	rp := vachettp.RequestParser{'GET /foo?field1=bar&field2=bazz&field3=buzz HTTP/2\r\nContent-Type: application/json\r\nAuthorization: Bearer 1337'}
+	r := rp.parse()
+
+	assert r.get_query_params() == {'field1': 'bar', 'field2': 'bazz', 'field3': 'buzz'}
+}

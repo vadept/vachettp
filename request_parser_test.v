@@ -68,7 +68,7 @@ fn test_command_first_line() {
 		RequestTestCase{'GET', vachettp.Request{}},
 		RequestTestCase{'GET /', vachettp.Request{}},
 		RequestTestCase{'GET HTTP/2', vachettp.Request{}},
-		RequestTestCase{'GET / HTTP/2', vachettp.Request{'GET', '/', 'HTTP/2', map[string]string{}}},
+		RequestTestCase{'GET / HTTP/2', vachettp.Request{'GET', '/', 'HTTP/2', map[string]string{}, map[string]string{}}},
 		RequestTestCase{'GET / HTTP/2 foo', vachettp.Request{}},
 	]
 
@@ -83,8 +83,8 @@ fn test_command_first_line() {
 
 fn test_multiline() {
 	test_cases := [
-		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json'}}}
-		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json\r\nAuthorization: Bearer 1337', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json', 'Authorization': 'Bearer 1337'}}}
+		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json'}, map[string]string{}}},
+		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json\r\nAuthorization: Bearer 1337', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json', 'Authorization': 'Bearer 1337'}, map[string]string{}}},
 	]
 
 	for test_case in test_cases {
@@ -94,5 +94,49 @@ fn test_multiline() {
 		assert r.get_path() == test_case.expect.get_path()
 		assert r.get_protocol_version() == test_case.expect.get_protocol_version()
 		assert r.get_headers() == test_case.expect.get_headers()
+	}
+}
+
+fn test_query_params() {
+	test_cases := [
+		RequestTestCase{'GET /foo HTTP/2\r\nContent-Type: application/json', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json'}, map[string]string{}}},
+		RequestTestCase{'GET /foo?field1=foo HTTP/2\r\nContent-Type: application/json', vachettp.Request{'GET', '/foo', 'HTTP/2', {'Content-Type': 'application/json'}, {'field1': 'foo'}}},
+		RequestTestCase{
+			'GET /foo?field1=foo&field2=bar&field3=bazz HTTP/2\r\nContent-Type: application/json', 
+			vachettp.Request{
+				'GET', 
+				'/foo', 
+				'HTTP/2', 
+				{'Content-Type': 'application/json'}, 
+				{'field1': 'foo', 'field2': 'bar', 'field3': 'bazz'}
+			}
+		},
+		RequestTestCase{
+			'GET /foo?field1=foo&field2&field3=bazzfield4=buzz HTTP/2\r\nContent-Type: application/json', 
+			vachettp.Request{
+				'GET', 
+				'/foo', 
+				'HTTP/2', 
+				{'Content-Type': 'application/json'}, 
+				{'field1': 'foo'}
+			}
+		},
+		RequestTestCase{
+			'GET /foo?field1=foo&field2=barfield3=bazz HTTP/2\r\nContent-Type: application/json', 
+			vachettp.Request{
+				'GET', 
+				'/foo', 
+				'HTTP/2', 
+				{'Content-Type': 'application/json'}, 
+				{'field1': 'foo'}
+			}
+		},
+	]
+
+	for test_case in test_cases {
+		r := vachettp.RequestParser{test_case.given}.parse()
+
+		assert r.get_path() == test_case.expect.get_path()
+		assert r.get_query_params() == test_case.expect.get_query_params()
 	}
 }
