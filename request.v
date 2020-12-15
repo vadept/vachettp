@@ -5,6 +5,7 @@ pub struct Request {
 	path string
 	protocol_version string
 	headers map[string]string
+	query_params map[string]string
 }
 
 pub fn (request Request) get_method() string {
@@ -21,4 +22,8 @@ pub fn (request Request) get_protocol_version() string {
 
 pub fn (request Request) get_headers() map[string]string {
 	return request.headers
+}
+
+pub fn (request Request) get_query_params() map[string]string {
+	return request.query_params
 }
