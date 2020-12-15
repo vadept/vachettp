@@ -1,29 +1,27 @@
 module vachettp
 
 pub struct RequestParser {
-	command string
+	command []byte
 }
 
 pub fn (requestParser RequestParser) parse() Request {
-	lines := requestParser.command.split('\r\n')
-
-	if 0 == lines.len {
+	command_content := requestParser.command.bytestr()
+	lines := command_content.split('\r\n')
+	first_line := lines[0]
+	first_line_elements := first_line.split(' ')
+	
+	if first_line_elements.len != 3 {
 		return Request{}
 	}
+	
+	method := set_method(first_line_elements[0])
+	path := set_path(first_line_elements[1])
+	protocol_version := set_protocol_version(first_line_elements[2])
+	query_params := set_query_params(first_line_elements[1])
 
-	elements := lines[0].split(' ')
+	mut headers := set_headers(lines[1..])
 
-	if elements.len != 3 {
-		return Request{}
-	}
-
-	return Request{
-		method : set_method(elements[0])// or { return error(err) }
-		path : set_path(elements[1])
-		protocol_version : set_protocol_version(elements[2])
-		headers : set_headers(lines[1..])
-		query_params : set_query_params(elements[1])
-	}
+	return Request{method, path, protocol_version, headers, query_params, ''}
 }
 
 fn set_method(method string) string {
