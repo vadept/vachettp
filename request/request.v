@@ -1,4 +1,4 @@
-module vachettp
+module vachettp_request
 
 pub struct Request {
 	method string
