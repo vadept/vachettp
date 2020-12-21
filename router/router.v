@@ -1,4 +1,4 @@
-module vachettp
+module vachettp_router
 
 pub struct Router {
 	routes []Route
