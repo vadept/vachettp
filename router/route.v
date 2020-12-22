@@ -1,19 +1,22 @@
 module vachettp_router
 
-pub struct Route {
+pub struct Route<T> {
 	path string
-	controller T
-	method string
+	function string
 }
 
-pub fn (route Route) get_path() string {
-	return route.path
+pub fn create_route<T>(path string, function string) Route<T> {
+	return Route<T>{path, function}
 }
 
-pub fn (route Route) get_controller() T {
-	return route.controller
-}
+// pub fn (route Route<T>) get_path() string {
+// 	return route.path
+// }
 
-pub fn (route Route) get_method() string {
-	return route.method
-}
+// pub fn (route Route<T>) get_controller_type() string {
+// 	return T.name
+// }
+
+// pub fn (route Route<T>) get_function_name() string {
+// 	return route.function
+// }
