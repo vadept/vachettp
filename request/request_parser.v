@@ -27,7 +27,7 @@ pub fn (requestParser RequestParser) parse() Request {
 }
 
 fn set_method(method string) string {
-	if method in ['GET', 'HEAD', 'POST', 'OPTIONS', 'TRACE', 'PUT', 'PATCH', 'DELETE'] {
+	if method in get_http_verbs() {
 		return method
 	}
 
@@ -96,6 +96,10 @@ fn set_query_params(path string) map[string]string {
 	}
 
 	return query_params
+}
+
+fn get_http_verbs() []string {
+	return ['GET', 'HEAD', 'POST', 'OPTIONS', 'TRACE', 'PUT', 'PATCH', 'DELETE']
 }
 
 fn get_http_version() []string {
