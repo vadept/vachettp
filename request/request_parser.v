@@ -47,7 +47,7 @@ fn set_protocol_version(protocol_version string) string {
 		return ''
 	}
 
-	if pv[0] in ['HTTP', 'http'] && pv[1] in ['1.0', '1.1', '2'] {
+	if pv[0] in ['HTTP', 'http'] && pv[1] in get_http_version() {
 		return protocol_version
 	}
 
@@ -96,4 +96,8 @@ fn set_query_params(path string) map[string]string {
 	}
 
 	return query_params
+}
+
+fn get_http_version() []string {
+	return ['1.0', '1.1', '2']
 }
